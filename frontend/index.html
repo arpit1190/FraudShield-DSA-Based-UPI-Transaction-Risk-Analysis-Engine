@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FraudShield – Real-Time UPI Transaction Risk Analysis Engine</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="shield-alert" class="logo-icon"></i>
+                    <span>FraudShield</span>
+                </div>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <a href="#" class="menu-item active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="transactions">
+                    <i data-lucide="arrow-left-right"></i>
+                    <span>Transactions</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="leaderboard">
+                    <i data-lucide="award"></i>
+                    <span>Leaderboard</span>
+                </a>
+                <a href="#" class="menu-item" data-tab="simulator">
+                    <i data-lucide="cpu"></i>
+                    <span>Simulator</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="add-user-btn" class="btn btn-secondary w-100">
+                    <i data-lucide="user-plus"></i>
+                    <span>Add User</span>
+                </button>
+                <div class="theme-toggle-container">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="theme-switch" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <div class="header-title">
+                    <h1 id="page-title">Dashboard Overview</h1>
+                    <p class="text-muted">Behavior-Based Real-Time UPI Transaction Risk Analysis Engine</p>
+                </div>
+                <div class="header-actions">
+                    <div id="connection-badge" class="badge badge-success">
+                        <span class="status-dot"></span>
+                        <span>Engine Online</span>
+                    </div>
+                    <button id="quick-tx-btn" class="btn btn-primary">
+                        <i data-lucide="plus-circle"></i>
+                        <span>New Transaction</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- TABS CONTAINER -->
+            <div class="tab-content-container">
+
+                <!-- 1. DASHBOARD TAB -->
+                <section id="dashboard-tab" class="tab-pane active">
+                    <!-- Statistics Grid -->
+                    <div class="stats-grid">
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon-wrapper blue">
+                                <i data-lucide="users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Users</span>
+                                <h3 id="stat-total-users" class="stat-value">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon-wrapper purple">
+                                <i data-lucide="file-text"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Transactions</span>
+                                <h3 id="stat-total-txs" class="stat-value">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="stat-card glass-card alert-card">
+                            <div class="stat-icon-wrapper red">
+                                <i data-lucide="shield-x"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Fraud Alerts</span>
+                                <h3 id="stat-fraud-alerts" class="stat-value">0</h3>
+                            </div>
+                            <div class="glow-alert"></div>
+                        </div>
+
+                        <div class="stat-card glass-card warning-card">
+                            <div class="stat-icon-wrapper orange">
+                                <i data-lucide="alert-triangle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Suspicious Txns</span>
+                                <h3 id="stat-suspicious-txs" class="stat-value">0</h3>
+                            </div>
+                        </div>
+
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon-wrapper emerald">
+                                <i data-lucide="indian-rupee"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Avg Txn Amount</span>
+                                <h3 id="stat-avg-amount" class="stat-value">₹0.00</h3>
+                            </div>
+                        </div>
+
+                        <div class="stat-card glass-card">
+                            <div class="stat-icon-wrapper gold">
+                                <i data-lucide="trending-up"></i>
+                            </div>
+                            <div class="stat-info">
+                                <span class="stat-label">Highest Txn</span>
+                                <h3 id="stat-highest-txn" class="stat-value">₹0.00</h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-container glass-card">
+                            <div class="chart-header">
+                                <h3>Fraud Detection Trend</h3>
+                                <p class="text-muted">Daily counts of critical fraud alerts</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="fraudTrendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container glass-card">
+                            <div class="chart-header">
+                                <h3>UPI Transaction Volume</h3>
+                                <p class="text-muted">Daily processing volume in INR (₹)</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="txnVolumeChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container glass-card">
+                            <div class="chart-header">
+                                <h3>Risk Profile Distribution</h3>
+                                <p class="text-muted">Proportion of Safe, Suspicious & Fraudulent transactions</p>
+                            </div>
+                            <div class="chart-wrapper doughnut">
+                                <canvas id="riskDistributionChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container glass-card">
+                            <div class="chart-header">
+                                <h3>Top Flags & Anomalies Triggered</h3>
+                                <p class="text-muted">Distribution of risk factors caught by the behavioral model</p>
+                            </div>
+                            <div class="chart-wrapper">
+                                <canvas id="userActivityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 2. TRANSACTIONS TAB -->
+                <section id="transactions-tab" class="tab-pane">
+                    <!-- Filters & Search Card -->
+                    <div class="filter-bar glass-card">
+                        <div class="filter-group">
+                            <label for="filter-search"><i data-lucide="search" class="filter-icon"></i> User Search</label>
+                            <input type="text" id="filter-search" placeholder="Enter UPI ID or Name...">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-date"><i data-lucide="calendar" class="filter-icon"></i> Date</label>
+                            <input type="date" id="filter-date">
+                        </div>
+                        <div class="filter-group">
+                            <label for="filter-risk"><i data-lucide="shield" class="filter-icon"></i> Risk Class</label>
+                            <select id="filter-risk">
+                                <option value="">All Transactions</option>
+                                <option value="SAFE">Safe Only</option>
+                                <option value="SUSPICIOUS">Suspicious Only</option>
+                                <option value="FRAUD">Fraud Alerts</option>
+                            </select>
+                        </div>
+                        <div class="filter-group toggle-group">
+                            <label for="filter-fraud-only">Fraud Only</label>
+                            <label class="switch">
+                                <input type="checkbox" id="filter-fraud-only">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="filter-actions">
+                            <button id="clear-filters" class="btn btn-secondary">Clear</button>
+                            <button id="apply-filters" class="btn btn-primary">Apply Filters</button>
+                        </div>
+                    </div>
+
+                    <!-- Split layout for table + behavior profiles -->
+                    <div class="transactions-split-layout">
+                        <!-- Left Panel: Transactions Table -->
+                        <div class="table-container glass-card flex-grow-1">
+                            <div class="table-header">
+                                <h2>Transaction Audit Ledger</h2>
+                                <span id="filtered-tx-count" class="badge badge-info">Showing 0 transactions</span>
+                            </div>
+                            <div class="table-scroll">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Txn ID</th>
+                                            <th>Sender (UPI)</th>
+                                            <th>Receiver (UPI)</th>
+                                            <th>Amount</th>
+                                            <th>Timestamp</th>
+                                            <th>Device</th>
+                                            <th>Location</th>
+                                            <th>Risk Score</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transactions-table-body">
+                                        <tr>
+                                            <td colspan="9" class="text-center py-4">
+                                                <div class="spinner"></div> Loading transactions...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: User Profiler Card -->
+                        <div id="profile-viewer-card" class="profile-viewer glass-card">
+                            <div class="profile-viewer-header">
+                                <h3>Customer Habit Profile</h3>
+                                <p class="text-muted">Select a sender UPI address to inspect behavioral habits</p>
+                            </div>
+                            <div id="profile-viewer-content" class="profile-viewer-body" style="display: none;">
+                                <h4 id="prof-name">Customer Name</h4>
+                                <span id="prof-upi" class="upi-text font-monospace">customer@upi</span>
+                                
+                                <div class="divider"></div>
+                                
+                                <div class="prof-limits-grid">
+                                    <div class="prof-limit-item">
+                                        <span class="text-muted">Avg Txn Size</span>
+                                        <strong id="prof-avg">₹0.00</strong>
+                                    </div>
+                                    <div class="prof-limit-item">
+                                        <span class="text-muted">Max Txn Size</span>
+                                        <strong id="prof-max">₹0.00</strong>
+                                    </div>
+                                    <div class="prof-limit-item">
+                                        <span class="text-muted">Min Txn Size</span>
+                                        <strong id="prof-min">₹0.00</strong>
+                                    </div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="prof-section">
+                                    <h5>Frequent / Trusted Receivers</h5>
+                                    <div id="prof-contacts" class="trusted-contacts-list">
+                                        <!-- badges loaded dynamically -->
+                                    </div>
+                                </div>
+
+                                <div class="divider"></div>
+
+                                <div class="prof-section">
+                                    <h5>Active Transaction Hours Heatmap</h5>
+                                    <div class="chart-wrapper profile-heatmap">
+                                        <canvas id="userProfileHeatmap"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="profile-viewer-empty" class="profile-viewer-empty text-center py-4">
+                                <i data-lucide="user-check" style="width: 48px; height: 48px; stroke: var(--text-muted); opacity: 0.5; margin-bottom: 15px;"></i>
+                                <p class="text-muted">Click the Sender VPA address of any transaction row to load their behavioral profiling metrics.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. LEADERBOARD TAB -->
+                <section id="leaderboard-tab" class="tab-pane">
+                    <div class="leaderboard-layout">
+                        <!-- Left Panel: Ranking list -->
+                        <div class="leaderboard-rankings glass-card">
+                            <div class="table-header">
+                                <h2>Risk Leaderboard (Priority-Heap Ranked)</h2>
+                                <p class="text-muted">Real-time ranking of accounts showing maximum fraud severity score</p>
+                            </div>
+                            <div class="table-scroll">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Rank</th>
+                                            <th>User Name</th>
+                                            <th>UPI Address</th>
+                                            <th>Highest Risk Score</th>
+                                            <th>Fraud Alert Count</th>
+                                            <th>Risk Profile</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="leaderboard-table-body">
+                                        <!-- Dynamic entries -->
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4">No suspicious users flagged.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Panel: Explanation of Heap DSA for students -->
+                        <div class="dsa-explanation glass-card">
+                            <div class="dsa-header">
+                                <i data-lucide="cpu" class="dsa-icon"></i>
+                                <h3>Interview DSA Spotlight</h3>
+                            </div>
+                            <div class="dsa-body">
+                                <h4>Heap-Based Leaderboard Ranking</h4>
+                                <p>To rank suspicious accounts in real-time, the system utilizes a **Custom Binary Max-Heap** (`MaxHeap` class in C++).</p>
+                                
+                                <div class="dsa-code-concept">
+                                    <strong>Why not sort?</strong>
+                                    <p>Sorting the entire user list takes <code>O(N log N)</code> time. A Max-Heap allows us to dynamically retrieve the most suspicious user in <code>O(1)</code> time, and insert/update in <code>O(log N)</code> time. This represents a massive performance optimization for real-time systems.</p>
+                                </div>
+
+                                <div class="heap-visualization">
+                                    <div class="heap-node root">Root (Max Risk)</div>
+                                    <div class="heap-branches">
+                                        <div class="heap-node left">Left Child</div>
+                                        <div class="heap-node right">Right Child</div>
+                                    </div>
+                                </div>
+
+                                <h4>Adaptive Scoring Rules:</h4>
+                                <ul>
+                                    <li><strong>Frequency Sliding Window:</strong> Analyzes velocity limits ($O(1)$ lookup and $O(k)$ window scan).</li>
+                                    <li><strong>Geographical Jump:</strong> Detects impossible travel speeds between subsequent transaction locations.</li>
+                                    <li><strong>Device Anomaly:</strong> Flags immediate session migrations.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. SIMULATOR TAB -->
+                <section id="simulator-tab" class="tab-pane">
+                    <div class="simulator-layout">
+                        <!-- Control Box -->
+                        <div class="simulator-control glass-card">
+                            <h2>Transaction Simulator Room</h2>
+                            <p class="text-muted">Simulate and stream hundreds of UPI transactions to stress-test our C++ risk engine and watch indicators update live.</p>
+                            
+                            <div class="simulator-card-body">
+                                <div class="form-group">
+                                    <label for="sim-count-slider">Transactions to Generate: <span id="sim-count-display">50</span></label>
+                                    <input type="range" id="sim-count-slider" min="10" max="300" step="10" value="50">
+                                </div>
+
+                                <div class="fraud-scenarios-box">
+                                    <h4>Injected Test Case Scenarios:</h4>
+                                    <div class="scenario-item">
+                                        <i data-lucide="lock" class="scen-icon blue"></i>
+                                        <div>
+                                            <strong>Account Takeover (ATO)</strong>
+                                            <p class="text-muted">Sudden location change + new device + unknown receiver + 30x average amount trigger.</p>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-item">
+                                        <i data-lucide="shield-alert" class="scen-icon purple"></i>
+                                        <div>
+                                            <strong>Trusted Night Contact (False Positive Reduction)</strong>
+                                            <p class="text-muted">Transaction made at 01:45 AM, but matching normal device, location, VPA, and pattern. Score stays SAFE.</p>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-item">
+                                        <i data-lucide="clock" class="scen-icon red"></i>
+                                        <div>
+                                            <strong>Velocity Attack (Burst)</strong>
+                                            <p class="text-muted">6 rapid transfers occurring in less than 3 minutes to trigger velocity thresholds.</p>
+                                        </div>
+                                    </div>
+                                    <div class="scenario-item">
+                                        <i data-lucide="share-2" class="scen-icon orange"></i>
+                                        <div>
+                                            <strong>Money Mule Dispersion</strong>
+                                            <p class="text-muted">Splitting funds rapidly among 5 different receiver UPI addresses in under 8 minutes.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button id="run-simulation-btn" class="btn btn-primary w-100 py-3 mt-3">
+                                    <i data-lucide="play-circle"></i>
+                                    <span>Initiate Simulation Stream</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Logger Console -->
+                        <div class="simulator-logger glass-card">
+                            <div class="logger-header">
+                                <h3>Engine Command Log</h3>
+                                <button id="clear-log-btn" class="btn btn-secondary btn-sm">Clear Console</button>
+                            </div>
+                            <div id="logger-console" class="console">
+                                <div class="console-line system">[SYSTEM] Ready for transaction simulation stream.</div>
+                                <div class="console-line system">[SYSTEM] Standing by for telemetry...</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL: ADD USER -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>Register New UPI Customer</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="add-user-form">
+                <div class="form-group">
+                    <label for="user-name">Full Customer Name</label>
+                    <input type="text" id="user-name" required placeholder="e.g. Ramesh Kumar">
+                </div>
+                <div class="form-group">
+                    <label for="user-upi">Virtual Payment Address (VPA / UPI ID)</label>
+                    <input type="text" id="user-upi" required placeholder="ramesh@okaxis">
+                </div>
+                <div class="form-group">
+                    <label for="user-phone">Registered Phone Number</label>
+                    <input type="text" id="user-phone" required placeholder="+91 99887 76655">
+                </div>
+                <div class="form-group">
+                    <label for="user-device">Default Device Signature</label>
+                    <input type="text" id="user-device" required placeholder="Samsung Galaxy S23">
+                </div>
+                <div class="form-group">
+                    <label for="user-location">Default Location (City)</label>
+                    <input type="text" id="user-location" required placeholder="Bangalore">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Register Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: NEW TRANSACTION -->
+    <div id="new-tx-modal" class="modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h2>Initiate Real-Time UPI Transaction</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <form id="new-tx-form">
+                <div class="form-group">
+                    <label for="tx-sender">Sender Account</label>
+                    <select id="tx-sender" required>
+                        <option value="">Select registered customer...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tx-receiver">Receiver UPI ID (VPA)</label>
+                    <input type="text" id="tx-receiver" required placeholder="e.g. merchant@paytm">
+                </div>
+                <div class="form-group">
+                    <label for="tx-amount">Amount (₹)</label>
+                    <input type="number" id="tx-amount" required min="1" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="tx-device">Initiating Device</label>
+                    <input type="text" id="tx-device" required placeholder="e.g. OnePlus 11">
+                </div>
+                <div class="form-group">
+                    <label for="tx-location">Initiating Location (City)</label>
+                    <input type="text" id="tx-location" required placeholder="e.g. Mumbai">
+                </div>
+                <div class="form-group">
+                    <label for="tx-time">Transaction Time (Optional)</label>
+                    <input type="datetime-local" id="tx-time" placeholder="Leave empty for current time">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Process Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: RISK EVALUATION DETAIL -->
+    <div id="risk-detail-modal" class="modal">
+        <div class="modal-content glass-card risk-modal">
+            <div class="modal-header">
+                <h2>Engine Risk Breakdown</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="risk-modal-body">
+                <div class="risk-score-display-radial">
+                    <div class="risk-score-circle">
+                        <span id="radial-score-val">0</span>
+                        <span class="radial-score-label">Risk Index</span>
+                    </div>
+                </div>
+                <div class="risk-summary-meta">
+                    <h3 id="risk-modal-level">SAFE</h3>
+                    <p>Transaction ID: <strong id="risk-modal-txid">TXN100000</strong></p>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="risk-reasons-container">
+                    <h4>Weighted Risk Contribution Log:</h4>
+                    <ul id="risk-reasons-list" class="reasons-list">
+                        <!-- Load dynamically with +/- color coding -->
+                    </ul>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary close-modal-btn w-100">Acknowledge Audit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Javascript Logic -->
+    <script src="index.js"></script>
+</body>
+</html>
